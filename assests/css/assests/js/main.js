@@ -2,7 +2,7 @@
 
 if (document.getElementById('avgScore')) {
 
-  fetch("http://127.0.0.1:5000/students")
+  fetch("https://student-performance-insight-system.onrender.com/")
     .then(res => res.json())
     .then(data => {
 
@@ -55,7 +55,7 @@ if (document.getElementById('avgScore')) {
 
   // ========= REAL DASHBOARD CHARTS FROM DATABASE =========
 
-fetch("http://127.0.0.1:5000/students")
+fetch("https://student-performance-insight-system.onrender.com/")
   .then(res => res.json())
   .then(data => {
 
@@ -140,7 +140,7 @@ if (document.getElementById("stuName")) {
   const params = new URLSearchParams(window.location.search);
   const rollNo = params.get("roll");
 
-  fetch("http://127.0.0.1:5000/students")
+  fetch("https://student-performance-insight-system.onrender.com/")
     .then(res => res.json())
     .then(data => {
 
@@ -178,7 +178,7 @@ if (document.getElementById("stuName")) {
   const params = new URLSearchParams(window.location.search);
   const rollNo = params.get("roll");
 
-  fetch("http://127.0.0.1:5000/students")
+  fetch("https://student-performance-insight-system.onrender.com/")
     .then(res => res.json())
     .then(data => {
 
@@ -327,7 +327,7 @@ if (document.getElementById('genderChart')) {
 
 if (document.getElementById('teacherTableBody')) {
 
-  fetch("http://127.0.0.1:5000/students")
+  fetch("https://student-performance-insight-system.onrender.com/")
     .then(res => res.json())
     .then(data => {
 
@@ -386,7 +386,7 @@ if (document.getElementById('teacherTableBody')) {
 // ===== TEACHER TABLE FROM BACKEND (VIEW + UPDATE + REMOVE) =====
 if (document.getElementById('teacherTableBody')) {
 
-  fetch("http://127.0.0.1:5000/students")
+  fetch("https://student-performance-insight-system.onrender.com/")
     .then(res => res.json())
     .then(data => {
       const tbody = document.getElementById('teacherTableBody');
@@ -424,7 +424,7 @@ function openUpdate(rollNo) {
   const attendance = prompt("Enter Attendance:");
   const grade = prompt("Enter Grade:");
 
-  fetch("http://127.0.0.1:5000/update-marks", {
+  fetch("https://student-performance-insight-system.onrender.com/", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -446,7 +446,7 @@ function openUpdate(rollNo) {
 //  DELETE FUNCTION (MUST ADD)
 function deleteStudent(rollNo) {
   if (confirm("Are you sure you want to remove this student?")) {
-    fetch(`http://127.0.0.1:5000/delete-student/${rollNo}`, {
+    fetch(`https://student-performance-insight-system.onrender.com/${rollNo}`, {
       method: "DELETE"
     })
     .then(res => res.json())
@@ -501,7 +501,7 @@ if (document.getElementById('studentForm')) {
   const tableBody = document.querySelector('#adminTable tbody');
 
 //  Load students from DB
-fetch("http://127.0.0.1:5000/students")
+fetch("https://student-performance-insight-system.onrender.com/")
   .then(res => res.json())
   .then(data => {
     tableBody.innerHTML = "";
@@ -549,7 +549,7 @@ fetch("http://127.0.0.1:5000/students")
 
     console.log("Sending to backend:", studentData);
 
-    fetch("http://127.0.0.1:5000/add-student", {
+    fetch("https://student-performance-insight-system.onrender.com/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -611,7 +611,7 @@ function saveAttendance() {
     });
   });
 
-  fetch("http://127.0.0.1:5000/mark_attendance", {
+  fetch("https://student-performance-insight-system.onrender.com/", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -657,7 +657,7 @@ if (document.getElementById("stuName")) {
   const params = new URLSearchParams(window.location.search);
   const rollNo = params.get("roll");
 
-  fetch("http://127.0.0.1:5000/students")
+  fetch("https://student-performance-insight-system.onrender.com/")
     .then(res => res.json())
     .then(data => {
 
@@ -687,7 +687,7 @@ if (
   document.getElementById("repAvgMarks") &&
   document.getElementById("subjectChart")
 ) {
-  fetch("http://127.0.0.1:5000/students")
+  fetch("https://student-performance-insight-system.onrender.com/")
     .then(res => res.json())
     .then(data => {
 
