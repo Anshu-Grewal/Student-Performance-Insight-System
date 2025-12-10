@@ -1,37 +1,43 @@
 // ======== DASHBOARD PAGE CODE (FINAL WITH REAL MARKS) ========
+const BASE_URL = "https://student-performance-insight-system.onrender.com";
 
 if (document.getElementById('avgScore')) {
 
-  fetch("https://student-performance-insight-system.onrender.com/")
+  fetch(`${BASE_URL}/students`)   // ✅ YAHI SABSE BADI GALTI THI
     .then(res => res.json())
     .then(data => {
 
       console.log("Dashboard Data:", data);
 
-      // Total Students
+      // ✅ Safety check
+      if (!Array.isArray(data)) {
+        console.error("Invalid data received:", data);
+        return;
+      }
+
       document.getElementById('totalStudents').innerText = data.length;
 
-      // REAL Average Score
       let totalMarks = 0;
-      data.forEach(s => {
-        totalMarks += Number(s.marks || 0);
-      });
-      const avgScore = data.length ? (totalMarks / data.length).toFixed(1) : "-";
+      data.forEach(s => totalMarks += Number(s.marks || 0));
+
+      const avgScore = data.length
+        ? (totalMarks / data.length).toFixed(1)
+        : "-";
+
       document.getElementById('avgScore').innerText = avgScore;
 
-      // REAL Average Attendance (simple average)
       let totalAtt = 0;
-      data.forEach(s => {
-        totalAtt += Number(s.attendance || 0);
-      });
-      const avgAtt = data.length ? (totalAtt / data.length).toFixed(1) + "%" : "-";
+      data.forEach(s => totalAtt += Number(s.attendance || 0));
+
+      const avgAtt = data.length
+        ? (totalAtt / data.length).toFixed(1) + "%"
+        : "-";
+
       document.getElementById('avgAtt').innerText = avgAtt;
 
-      // Top performers = A / A+ wale
       const toppers = data.filter(s => s.grade === "A" || s.grade === "A+").length;
       document.getElementById('topPerformers').innerText = toppers;
 
-      // Table render
       const tbody = document.getElementById('studentTable');
       tbody.innerHTML = "";
 
@@ -52,14 +58,20 @@ if (document.getElementById('avgScore')) {
 
 
 
-
   // ========= REAL DASHBOARD CHARTS FROM DATABASE =========
 
-fetch("https://student-performance-insight-system.onrender.com/")
+// Yahan bhi same BASE_URL use hoga (jo PART-1 me bana diya tha)
+// const BASE_URL = "https://student-performance-insight-system.onrender.com";
+
+fetch(`${BASE_URL}/students`)   // ✅ YAHAN BHI "/" KI JAGAH "/students"
   .then(res => res.json())
   .then(data => {
 
-    // ================= PERFORMANCE TREND (LINE CHART) =================
+    if (!Array.isArray(data)) {
+      console.error("Chart invalid data:", data);
+      return;
+    }
+
     if (document.getElementById('scoreChart')) {
 
       const marksArray = data.map(s => Number(s.marks || 0));
@@ -72,58 +84,20 @@ fetch("https://student-performance-insight-system.onrender.com/")
         marksArray[4] || 80
       ];
 
-      const scoreCtx = document.getElementById('scoreChart').getContext('2d');
+      const scoreCtx = document
+        .getElementById('scoreChart')
+        .getContext('2d');
+
       new Chart(scoreCtx, {
         type: 'line',
         data: {
           labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
           datasets: [{
-            label: 'Average Score',
             data: avgMarksPerMonth,
-            borderColor: '#004aad',
             borderWidth: 2,
             fill: false,
             tension: 0.3
           }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: false }
-          }
-        }
-      });
-    }
-
-    // ================= ATTENDANCE DISTRIBUTION (DOUGHNUT) =================
-    if (document.getElementById('attendanceChart')) {
-
-      let totalAttendance = 0;
-      data.forEach(s => {
-        totalAttendance += Number(s.attendance || 0);
-      });
-
-      const avgAttendance = data.length
-        ? Math.round(totalAttendance / data.length)
-        : 0;
-
-      const absent = 100 - avgAttendance;
-
-      const attCtx = document.getElementById('attendanceChart').getContext('2d');
-      new Chart(attCtx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Present', 'Absent'],
-          datasets: [{
-            data: [avgAttendance, absent],
-            backgroundColor: ['#22c55e', '#ef4444']
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { position: 'bottom' }
-          }
         }
       });
     }
@@ -140,63 +114,28 @@ if (document.getElementById("stuName")) {
   const params = new URLSearchParams(window.location.search);
   const rollNo = params.get("roll");
 
-  fetch("https://student-performance-insight-system.onrender.com/")
+  fetch(`${BASE_URL}/students`)   // ✅ /students route
     .then(res => res.json())
     .then(data => {
 
       // Roll number ke basis par student dhoondo
       const student = data.find(s => s.roll_no == rollNo) || data[0];
 
-      // Profile fill karo
-      document.getElementById("stuName").innerText = student.name;
-      document.getElementById("stuRoll").innerText = student.roll_no;
-      document.getElementById("stuClass").innerText = student.class;
-
-      // Temporary (jab tak DB me attendance/grade nahi ho)
-      document.getElementById("stuAtt").innerText = "92%";
-      document.getElementById("stuGrade").innerText = "A";
-
-      // Marks (static for now, later DB se aayega)
-      const marksBody = document.getElementById("marksTableBody");
-      marksBody.innerHTML = `
-        <tr><td>Python</td><td>85</td></tr>
-        <tr><td>Data Analytics</td><td>88</td></tr>
-        <tr><td>AI & ML</td><td>80</td></tr>
-        <tr><td>DBMS</td><td>78</td></tr>
-        <tr><td>Cloud Computing</td><td>90</td></tr>
-      `;
-    })
-    .catch(err => console.error("Student Detail Error:", err));
-  }
-
-
-// ======== STUDENT PAGE CHART ========
-// ======== STUDENT DETAIL PAGE (REAL DATABASE) ========
-
-if (document.getElementById("stuName")) {
-
-  const params = new URLSearchParams(window.location.search);
-  const rollNo = params.get("roll");
-
-  fetch("https://student-performance-insight-system.onrender.com/")
-    .then(res => res.json())
-    .then(data => {
-
-      const student = data.find(s => s.roll_no == rollNo);
-
       if (!student) {
-        alert("Student not found!");
+        console.error("Student not found!");
         return;
       }
 
-      //  REAL PROFILE DATA
+      // Profile fill karo (REAL DATA)
       document.getElementById("stuName").innerText = student.name;
       document.getElementById("stuRoll").innerText = student.roll_no;
       document.getElementById("stuClass").innerText = student.class;
+
+      // REAL Attendance + Grade (DB se)
       document.getElementById("stuAtt").innerText = student.attendance + "%";
       document.getElementById("stuGrade").innerText = student.grade;
 
-      //  REAL SUBJECT-WISE MARKS (AUTO GENERATED FROM DB MARKS)
+      // REAL Marks (base marks se subject-wise generate)
       const base = Number(student.marks || 0);
 
       const subjectMarks = [
@@ -215,8 +154,57 @@ if (document.getElementById("stuName")) {
         <tr><td>DBMS</td><td>${subjectMarks[3]}</td></tr>
         <tr><td>Cloud Computing</td><td>${subjectMarks[4]}</td></tr>
       `;
+    })
+    .catch(err => console.error("Student Detail Error:", err));
+}
 
-      //  REAL STUDENT CHART
+// ======== STUDENT PAGE CHART ========
+// ======== STUDENT DETAIL PAGE (REAL DATABASE) ========
+
+if (document.getElementById("stuName")) {
+
+  const params = new URLSearchParams(window.location.search);
+  const rollNo = params.get("roll");
+
+  fetch(`${BASE_URL}/students`)   // ✅ BASE_URL + /students
+    .then(res => res.json())
+    .then(data => {
+
+      const student = data.find(s => s.roll_no == rollNo);
+
+      if (!student) {
+        alert("Student not found!");
+        return;
+      }
+
+      // ✅ REAL PROFILE DATA
+      document.getElementById("stuName").innerText = student.name;
+      document.getElementById("stuRoll").innerText = student.roll_no;
+      document.getElementById("stuClass").innerText = student.class;
+      document.getElementById("stuAtt").innerText = student.attendance + "%";
+      document.getElementById("stuGrade").innerText = student.grade;
+
+      // ✅ REAL SUBJECT-WISE MARKS (AUTO GENERATED FROM DB MARKS)
+      const base = Number(student.marks || 0);
+
+      const subjectMarks = [
+        Math.max(base - 5, 0),
+        Math.min(base + 3, 100),
+        Math.max(base - 2, 0),
+        Math.max(base - 7, 0),
+        Math.min(base + 4, 100)
+      ];
+
+      const marksBody = document.getElementById("marksTableBody");
+      marksBody.innerHTML = `
+        <tr><td>Python</td><td>${subjectMarks[0]}</td></tr>
+        <tr><td>Data Analytics</td><td>${subjectMarks[1]}</td></tr>
+        <tr><td>AI & ML</td><td>${subjectMarks[2]}</td></tr>
+        <tr><td>DBMS</td><td>${subjectMarks[3]}</td></tr>
+        <tr><td>Cloud Computing</td><td>${subjectMarks[4]}</td></tr>
+      `;
+
+      // ✅ REAL STUDENT CHART
       if (document.getElementById('studentChart')) {
         const ctx = document.getElementById('studentChart').getContext('2d');
 
@@ -252,10 +240,9 @@ if (document.getElementById("stuName")) {
 }
 
 
-
 // ======== REPORT PAGE CHARTS ========
 
-// 1. Subject-wise bar chart
+// 1. Subject-wise bar chart (STATIC - OK)
 if (document.getElementById('subjectChart')) {
   const ctx1 = document.getElementById('subjectChart').getContext('2d');
   new Chart(ctx1, {
@@ -272,7 +259,7 @@ if (document.getElementById('subjectChart')) {
   });
 }
 
-// 2. Monthly performance line chart
+// 2. Monthly performance line chart (STATIC - OK)
 if (document.getElementById('trendChart')) {
   const ctx2 = document.getElementById('trendChart').getContext('2d');
   new Chart(ctx2, {
@@ -292,7 +279,7 @@ if (document.getElementById('trendChart')) {
   });
 }
 
-// 3. Attendance pie chart
+// 3. Attendance pie chart (STATIC - OK)
 if (document.getElementById('attendancePie')) {
   const ctx3 = document.getElementById('attendancePie').getContext('2d');
   new Chart(ctx3, {
@@ -308,7 +295,7 @@ if (document.getElementById('attendancePie')) {
   });
 }
 
-// 4. Gender performance doughnut chart
+// 4. Gender performance doughnut chart (STATIC - OK)
 if (document.getElementById('genderChart')) {
   const ctx4 = document.getElementById('genderChart').getContext('2d');
   new Chart(ctx4, {
@@ -325,9 +312,11 @@ if (document.getElementById('genderChart')) {
 }
 
 
+// ================= TEACHER TABLE (FROM BACKEND) =================
+
 if (document.getElementById('teacherTableBody')) {
 
-  fetch("https://student-performance-insight-system.onrender.com/")
+  fetch(`${BASE_URL}/students`)   // ✅ BASE_URL + /students
     .then(res => res.json())
     .then(data => {
 
@@ -341,7 +330,7 @@ if (document.getElementById('teacherTableBody')) {
 
       data.forEach(stu => {
 
-        //  Table fill
+        // ✅ Table fill
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${stu.roll_no}</td>
@@ -354,39 +343,40 @@ if (document.getElementById('teacherTableBody')) {
         `;
         tbody.appendChild(tr);
 
-        //  Calculations
+        // ✅ Calculations
         totalMarks += Number(stu.marks || 0);
         totalAttendance += Number(stu.attendance || 0);
 
-        if (stu.marks > topMarks) {
-          topMarks = stu.marks;
+        if (Number(stu.marks) > topMarks) {
+          topMarks = Number(stu.marks);
           topStudent = stu.name;
         }
 
       });
 
-      //  TOTAL STUDENTS (REAL)
+      // ✅ TOTAL STUDENTS (REAL)
       document.getElementById("totalStudents").innerText = data.length;
 
-      //  AVERAGE MARKS (REAL)
+      // ✅ AVERAGE MARKS (REAL)
       const avgMarks = (totalMarks / data.length).toFixed(1);
       document.getElementById("avgMarks").innerText = avgMarks + "%";
 
-      //  AVERAGE ATTENDANCE (REAL)
+      // ✅ AVERAGE ATTENDANCE (REAL)
       const avgAttendance = (totalAttendance / data.length).toFixed(1);
       document.getElementById("avgAttendance").innerText = avgAttendance + "%";
 
-      //  TOP PERFORMER (REAL)
+      // ✅ TOP PERFORMER (REAL)
       document.getElementById("topPerformer").innerText = topStudent;
 
     })
     .catch(err => console.error("Teacher Table Error:", err));
 }
 
+
 // ===== TEACHER TABLE FROM BACKEND (VIEW + UPDATE + REMOVE) =====
 if (document.getElementById('teacherTableBody')) {
 
-  fetch("https://student-performance-insight-system.onrender.com/")
+  fetch(`${BASE_URL}/students`)   // ✅ Correct GET route
     .then(res => res.json())
     .then(data => {
       const tbody = document.getElementById('teacherTableBody');
@@ -402,11 +392,7 @@ if (document.getElementById('teacherTableBody')) {
           <td>${stu.attendance}</td>
           <td>${stu.grade}</td>
           <td>
-         
-
-            
-          <a href="student.html?roll=${stu.roll_no}" class="view-btn">View</a>
-
+            <a href="student.html?roll=${stu.roll_no}" class="view-btn">View</a>
             <button class="update-btn" onclick="openUpdate(${stu.roll_no})">Update</button>
             <button class="delete-btn" onclick="deleteStudent(${stu.roll_no})">Remove</button>
           </td>
@@ -418,47 +404,44 @@ if (document.getElementById('teacherTableBody')) {
 }
 
 
-//  UPDATE FUNCTION
+// ================= UPDATE FUNCTION =================
 function openUpdate(rollNo) {
   const marks = prompt("Enter Marks:");
   const attendance = prompt("Enter Attendance:");
   const grade = prompt("Enter Grade:");
 
-  fetch("https://student-performance-insight-system.onrender.com/", {
-    method: "POST",
+  fetch(`${BASE_URL}/students/${rollNo}`, {   // ✅ Correct PUT route
+    method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      roll_no: rollNo,
-      marks: marks,
-      attendance: attendance,
-      grade: grade
+      marks,
+      attendance,
+      grade
     })
   })
   .then(res => res.json())
   .then(data => {
-    alert(" Updated Successfully");
+    alert("✅ Updated Successfully");
     location.reload();
   })
   .catch(err => console.error("Update Error:", err));
 }
 
 
-//  DELETE FUNCTION (MUST ADD)
+// ================= DELETE FUNCTION =================
 function deleteStudent(rollNo) {
   if (confirm("Are you sure you want to remove this student?")) {
-    fetch(`https://student-performance-insight-system.onrender.com/${rollNo}`, {
+    fetch(`${BASE_URL}/students/${rollNo}`, {   // ✅ Correct DELETE route
       method: "DELETE"
     })
     .then(res => res.json())
     .then(data => {
-      alert(" Student Removed");
+      alert("✅ Student Removed");
       location.reload();
     })
     .catch(err => console.error("Delete Error:", err));
   }
 }
-
-
 
 
 
@@ -475,67 +458,66 @@ if (document.getElementById('loginForm')) {
     const password = document.getElementById('password').value.trim();
 
     if (username === 'admin' && password === '12345') {
-  msg.style.color = 'green';
-  msg.textContent = 'Login successful! Redirecting...';
+      msg.style.color = 'green';
+      msg.textContent = 'Login successful! Redirecting...';
 
-  // LOGIN FLAG SET
-  localStorage.setItem("isLoggedIn", "true");
+      // LOGIN FLAG SET
+      localStorage.setItem("isLoggedIn", "true");
 
-  setTimeout(() => {
-    window.location.href = 'index.html';
-  }, 1500);
-}
-else {
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1500);
+    } else {
       msg.style.color = 'red';
       msg.textContent = 'Invalid username or password!';
     }
   });
 }
 
-// ===== ADMIN PANEL (SAFE + REAL DATABASE LOAD) =====
 
-// ===== ADMIN PANEL (REAL DATABASE INSERT) =====
+// ===== ADMIN PANEL (REAL DATABASE LOAD + INSERT) =====
 if (document.getElementById('studentForm')) {
 
   const form = document.getElementById('studentForm');
   const tableBody = document.querySelector('#adminTable tbody');
 
-//  Load students from DB
-fetch("https://student-performance-insight-system.onrender.com/")
-  .then(res => res.json())
-  .then(data => {
-    tableBody.innerHTML = "";
-    data.forEach(s => {
-      const row = document.createElement('tr');
+  // ✅ LOAD STUDENTS FROM BACKEND
+  fetch(`${BASE_URL}/students`)   // ✅ Correct GET route
+    .then(res => res.json())
+    .then(data => {
+      tableBody.innerHTML = "";
+      data.forEach(s => {
+        const row = document.createElement('tr');
 
-      row.innerHTML = `
-        <td>${s.name}</td>
-        <td>${s.class}</td>
-        <td>${s.marks}</td>
-        <td>${s.grade}</td>
+        row.innerHTML = `
+          <td>${s.name}</td>
+          <td>${s.class}</td>
+          <td>${s.marks || "-"}</td>
+          <td>${s.grade || "-"}</td>
 
-        <!-- Status Text -->
-        <td class="statusText" data-id="${s.roll_no}">
-          Absent
-        </td>
+          <!-- Status Text -->
+          <td class="statusText" data-id="${s.roll_no}">
+            Absent
+          </td>
 
-        <!-- Final Attendance Checkbox -->
-        <td>
-          <input type="checkbox" class="attBox" data-id="${s.roll_no}">
-        </td>
+          <!-- Final Attendance Checkbox -->
+          <td>
+            <input type="checkbox" class="attBox" data-id="${s.roll_no}">
+          </td>
 
-        <!-- Action -->
-        <td>
-          <button onclick="deleteStudent(${s.roll_no})">Delete</button>
-        </td>
-      `;
+          <!-- Action -->
+          <td>
+            <button onclick="deleteStudent(${s.roll_no})">Delete</button>
+          </td>
+        `;
 
-      tableBody.appendChild(row);
-    });
-  })
-  .catch(err => console.error("Admin Load Error:", err));
+        tableBody.appendChild(row);
+      });
+    })
+    .catch(err => console.error("Admin Load Error:", err));
 
-  //  Submit Form → Insert to DB
+
+  // ✅ SUBMIT FORM → INSERT TO BACKEND
   form.addEventListener('submit', function(e) {
     e.preventDefault();
 
@@ -549,7 +531,7 @@ fetch("https://student-performance-insight-system.onrender.com/")
 
     console.log("Sending to backend:", studentData);
 
-    fetch("https://student-performance-insight-system.onrender.com/", {
+    fetch(`${BASE_URL}/students`, {   // ✅ Correct POST route
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -558,7 +540,7 @@ fetch("https://student-performance-insight-system.onrender.com/")
     })
     .then(res => res.json())
     .then(response => {
-      alert(" Student added successfully!");
+      alert("✅ Student added successfully!");
       location.reload();
     })
     .catch(err => console.error("Admin Insert Error:", err));
@@ -568,11 +550,7 @@ fetch("https://student-performance-insight-system.onrender.com/")
 
 
 
-
-
 // ======== CONTACT PAGE LOGIC ========
-
-
 
 if (document.getElementById('contactForm')) {
   const form = document.getElementById('contactForm');
@@ -591,8 +569,7 @@ if (document.getElementById('contactForm')) {
 }
 
 
-
-
+// ================= SAVE ATTENDANCE =================
 function saveAttendance() {
   let date = document.getElementById("attDate").value;
   let boxes = document.querySelectorAll(".attBox");
@@ -611,7 +588,7 @@ function saveAttendance() {
     });
   });
 
-  fetch("https://student-performance-insight-system.onrender.com/", {
+  fetch(`${BASE_URL}/attendance`, {   // ✅ Correct backend route
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -620,7 +597,7 @@ function saveAttendance() {
     })
   })
   .then(res => res.json())
-  .then(res => alert(res.message))
+  .then(res => alert(res.message || "Attendance saved!"))
   .catch(err => {
     console.error("Attendance Save Error:", err);
     alert("Attendance save failed!");
@@ -644,10 +621,11 @@ if (searchBar) {
   });
 }
 
+
+// ===== SIDEBAR TOGGLE =====
 function toggleSidebar() {
   document.querySelector(".sidebar").classList.toggle("active");
 }
-
 
 
 // ===== STUDENT PROFILE PAGE LOGIC =====
@@ -657,7 +635,7 @@ if (document.getElementById("stuName")) {
   const params = new URLSearchParams(window.location.search);
   const rollNo = params.get("roll");
 
-  fetch("https://student-performance-insight-system.onrender.com/")
+  fetch(`${BASE_URL}/students`)   // ✅ Correct API route
     .then(res => res.json())
     .then(data => {
 
@@ -668,6 +646,7 @@ if (document.getElementById("stuName")) {
         return;
       }
 
+      // ✅ REAL DATA BINDING
       document.getElementById("stuName").innerText = student.name;
       document.getElementById("stuRoll").innerText = student.roll_no;
       document.getElementById("stuClass").innerText = student.class;
@@ -681,17 +660,21 @@ if (document.getElementById("stuName")) {
 }
 
 
-
 // ====== REPORT PAGE BACKEND CONNECTION ======
 if (
   document.getElementById("repAvgMarks") &&
   document.getElementById("subjectChart")
 ) {
-  fetch("https://student-performance-insight-system.onrender.com/")
+  fetch(`${BASE_URL}/students`)   // ✅ Correct API route
     .then(res => res.json())
     .then(data => {
 
-      // Average Marks
+      if (!data || data.length === 0) {
+        console.warn("No student data found!");
+        return;
+      }
+
+      // ✅ Average Marks
       let totalMarks = 0;
       let passCount = 0;
       let topStudent = data[0];
@@ -713,7 +696,7 @@ if (
       document.getElementById("repPass").innerText = passPercent + "%";
       document.getElementById("repTopper").innerText = topStudent.name;
 
-      //  SUBJECT CHART REAL SAMPLE DATA
+      // ✅ SUBJECT CHART (STATIC DEMO DATA – OK)
       new Chart(document.getElementById('subjectChart'), {
         type: 'bar',
         data: {
@@ -727,7 +710,7 @@ if (
         options: { responsive: true, plugins: { legend: { display: false } } }
       });
 
-      //  TREND CHART
+      // ✅ TREND CHART (STATIC DEMO DATA – OK)
       new Chart(document.getElementById('trendChart'), {
         type: 'line',
         data: {
@@ -741,7 +724,7 @@ if (
         }
       });
 
-      //  ATTENDANCE PIE
+      // ✅ ATTENDANCE PIE (STATIC DEMO DATA – OK)
       new Chart(document.getElementById('attendancePie'), {
         type: 'pie',
         data: {
@@ -753,7 +736,7 @@ if (
         }
       });
 
-      // GENDER CHART (DEMO)
+      // ✅ GENDER CHART (STATIC DEMO DATA – OK)
       new Chart(document.getElementById('genderChart'), {
         type: 'doughnut',
         data: {
@@ -765,10 +748,12 @@ if (
         }
       });
 
-    });
+    })
+    .catch(err => console.error("Report Page Fetch Error:", err));
 }
 
 
+// ================= ATTENDANCE STATUS UI CHANGE =================
 document.addEventListener("change", function (e) {
   if (e.target.classList.contains("attBox")) {
     const studentId = e.target.dataset.id;
@@ -776,19 +761,22 @@ document.addEventListener("change", function (e) {
       `.statusText[data-id="${studentId}"]`
     );
 
-    if (e.target.checked) {
-      statusCell.textContent = "Present";
-      statusCell.style.color = "#004aad";
-      statusCell.style.fontWeight = "bold";
-    } else {
-      statusCell.textContent = "Absent";
-      statusCell.style.color = "red";
-      statusCell.style.fontWeight = "bold";
+    if (statusCell) {
+      if (e.target.checked) {
+        statusCell.textContent = "Present";
+        statusCell.style.color = "#004aad";
+        statusCell.style.fontWeight = "bold";
+      } else {
+        statusCell.textContent = "Absent";
+        statusCell.style.color = "red";
+        statusCell.style.fontWeight = "bold";
+      }
     }
   }
 });
 
 
+// ================= SIDEBAR TOGGLE =================
 function toggleSidebar() {
   const sidebar = document.querySelector(".sidebar");
 
