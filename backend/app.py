@@ -5,9 +5,12 @@ import sqlite3
 
 CORS(app)
 
+from flask import jsonify
+
 @app.route("/")
 def home():
-    return "Student Insight Backend Running Successfully ✅"
+    return jsonify({"message": "Student Insight Backend Running Successfully ✅"})
+
 
 @app.route("/students", methods=["GET"])
 def get_students():
