@@ -3,7 +3,7 @@
 // ======= DASHBOARD FETCH (ROBUST + DEBUG) =======
 if (document.getElementById('avgScore')) {
 
-    fetch("https://student-performance-insight-system-1.onrender.com/students")
+    fetch("https://student-performance-insight-system.onrender.com/students")
         .then(res => {
             if (!res.ok) throw new Error('Network response not ok: ' + res.status);
             return res.json();
@@ -134,7 +134,7 @@ let allStudents = [];  // store data globally
 
 // When page loads, fetch students
 if (document.getElementById("studentTableBody")) {
-    fetch("https://student-performance-insight-system-1.onrender.com/students")
+    fetch("https://student-performance-insight-system.onrender.com/students")
         .then(res => res.json())
         .then(data => {
             allStudents = data;   // save all data
@@ -168,7 +168,7 @@ function displayStudents(list) {
 
 // Load students when table exists
 if (document.getElementById("studentTable")) {
-    fetch("https://student-performance-insight-system-1.onrender.com/students")
+    fetch("https://student-performance-insight-system.onrender.com/students")
         .then(res => res.json())
         .then(data => {
             allStudents = data;
@@ -216,7 +216,7 @@ if (document.getElementById("stuName")) {
     const params = new URLSearchParams(window.location.search);
     const rollNo = params.get("roll");
 
-    fetch("https://student-performance-insight-system-1.onrender.com/students")
+    fetch("https://student-performance-insight-system.onrender.com/students")
         .then(res => res.json())
         .then(data => {
 
@@ -384,7 +384,7 @@ if (document.getElementById('genderChart')) {
 
 if (document.getElementById("totalStudents")) {
 
-    fetch("https://student-performance-insight-system-1.onrender.com/students")
+    fetch("https://student-performance-insight-system.onrender.com/students")
         .then(res => res.json())
         .then(data => {
 
@@ -416,7 +416,7 @@ if (document.getElementById("totalStudents")) {
 
 if (document.getElementById('teacherTableBody')) {
 
-    fetch("https://student-performance-insight-system-1.onrender.com/students")
+    fetch("https://student-performance-insight-system.onrender.com/students")
         .then(res => res.json())
         .then(data => {
 
@@ -521,7 +521,7 @@ document.getElementById("closeBtn").onclick = () => {
 // SAVE BUTTON
 document.getElementById("saveBtn").onclick = () => {
 
-    fetch("https://student-performance-insight-system-1.onrender.com/update-marks", {
+    fetch("https://student-performance-insight-system.onrender.com/update-marks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -544,7 +544,7 @@ document.getElementById("saveBtn").onclick = () => {
 function removeStudent(roll) {
     if (!confirm("Delete this student?")) return;
 
-    fetch(`https://student-performance-insight-system-1.onrender.com/delete-student/${roll}`, {
+    fetch(`https://student-performance-insight-system.onrender.com/delete-student/${roll}`, {
         method: "DELETE"
     })
         .then(res => res.json())
@@ -560,7 +560,7 @@ function removeStudent(roll) {
 function removeStudent(roll) {
     if (!confirm("Delete this student?")) return;
 
-    fetch(`https://student-performance-insight-system-1.onrender.com/delete-student/${roll}`, {
+    fetch(`https://student-performance-insight-system.onrender.com/delete-student/${roll}`, {
         method: "DELETE"
     })
     .then(res => res.json())
@@ -616,7 +616,7 @@ if (document.getElementById('loginForm')) {
         const password = document.getElementById('password').value.trim();
 
         // Try server-side login first (if backend provides /login)
-        fetch("https://student-performance-insight-system-1.onrender.com/login", {
+        fetch("https://student-performance-insight-system.onrender.com/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username: username, password: password })
@@ -667,7 +667,7 @@ if (document.getElementById('studentForm')) {
     const tableBody = document.querySelector('#adminTable tbody');
 
     // Load existing data
-    fetch("https://student-performance-insight-system-1.onrender.com/students")
+    fetch("https://student-performance-insight-system.onrender.com/students")
         .then(res => res.json())
         .then(data => {
             tableBody.innerHTML = "";
@@ -696,7 +696,7 @@ if (document.getElementById('studentForm')) {
             phone: document.getElementById('phone').value
         };
 
-        fetch("https://student-performance-insight-system-1.onrender.com/add-student", {
+        fetch("https://student-performance-insight-system.onrender.com/add-student", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(studentData)
@@ -737,7 +737,7 @@ if (document.getElementById('contactForm')) {
 // ===================== REPORT PAGE LOGIC ======================
 if (document.getElementById("repAvgMarks")) {
 
-    fetch("https://student-performance-insight-system-1.onrender.com/students")
+    fetch("https://student-performance-insight-system.onrender.com/students")
         .then(res => res.json())
         .then(data => {
 
